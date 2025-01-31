@@ -18,25 +18,25 @@ export default function HomePage() {
             href="/tasks"
             title="タスク管理"
             description="農作業のタスクを管理し、進捗を記録します"
-            iconName="📋"
+            iconSrc="/1.png"
           />
           <NavCard
             href="/gacha"
             title="ガチャ"
             description="獲得したポイントでガチャを回して報酬をゲット"
-            iconName="🎁"
+            iconSrc="/49.png"
           />
           <NavCard
             href="/exchange"
             title="アイテム交換所"
             description="獲得したアイテムを交換して報酬を入手"
-            iconName="🏪"
+            iconSrc="/59.png"
           />
           <NavCard
             href="/admin/settings"
             title="管理設定"
             description="システムの設定を管理します"
-            iconName="⚙️"
+            iconSrc="/67.png"
           />
         </div>
       </div>
