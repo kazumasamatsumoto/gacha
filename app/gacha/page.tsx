@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { GachaTicket } from "@/components/gacha-ticket";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,12 @@ import { GachaResultModal } from "@/components/gacha-result-modal";
 import { useCurrencyStore } from "@/store/currency-store";
 import { toast } from "@/components/ui/toast";
 import { useSettingsStore } from "@/store/settings-store";
+import { BlackOut } from "@/components/gacha-effects/black-out";
+import { Vibration } from "@/components/gacha-effects/vibration";
+import { GogoLamp } from "@/components/gacha-effects/gogo-lamp";
+import { RainbowCutIn } from "@/components/gacha-effects/rainbow-cut-in";
+
+type EffectType = "blackout" | "vibration" | "gogo" | "rainbow" | null;
 
 export default function GachaPage() {
   const { seigyoku, shinyouPoint, spendSeigyoku, addShinyouPoint } =
@@ -17,7 +23,20 @@ export default function GachaPage() {
   const [showResult, setShowResult] = useState(false);
   const [gachaResult, setGachaResult] = useState<"win" | "lose" | null>(null);
 
-  const handleSpin = () => {
+  // 演出用のstate（1つにまとめる）
+  const [currentEffect, setCurrentEffect] = useState<EffectType>(null);
+
+  const playRandomEffect = async () => {
+    const effects: EffectType[] = ["blackout", "vibration", "gogo", "rainbow"];
+    const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+    setCurrentEffect(randomEffect);
+
+    // 演出の時間（2秒）を待つ
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    setCurrentEffect(null);
+  };
+
+  const handleSpin = async () => {
     // 星玉が足りるかチェック
     if (seigyoku < 100) {
       toast.error("星玉が不足しています", {
@@ -35,22 +54,31 @@ export default function GachaPage() {
       description: "100個の星玉を消費しました",
     });
 
-    // ガチャ回転開始
     setIsSpinning(true);
 
-    // 3秒後に結果を表示
-    setTimeout(() => {
-      const winRate = getWinRate();
-      const result = Math.random() < winRate ? "win" : "lose";
-      setGachaResult(result);
+    // 抽選を先に行う（ただし結果は見せない）
+    const winRate = getWinRate();
+    const result = Math.random() < winRate ? "win" : "lose";
 
-      if (result === "win") {
-        addShinyouPoint(1000000);
-      }
+    if (result === "win") {
+      // 1秒回転させてから演出
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await playRandomEffect();
+      // 演出後もう少し回転
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } else {
+      // はずれの場合は通常の回転のみ
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
 
-      setIsSpinning(false);
-      setShowResult(true);
-    }, 3000);
+    setIsSpinning(false);
+    setGachaResult(result);
+
+    if (result === "win") {
+      addShinyouPoint(1000000);
+    }
+
+    setShowResult(true);
   };
 
   const closeResult = () => {
@@ -60,23 +88,28 @@ export default function GachaPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen flex flex-col items-center justify-center">
+      <BlackOut show={currentEffect === "blackout"} />
+      <GogoLamp show={currentEffect === "gogo"} />
+      <RainbowCutIn show={currentEffect === "rainbow"} />
+
       <h1 className="text-4xl font-bold text-center mb-8 text-white">
         宇宙ガチャ
       </h1>
 
-      <div className="relative w-full max-w-md mb-8">
-        {/* <GachaMist isSpinning={isSpinning} result={gachaResult} /> */}
-        <motion.div
-          animate={isSpinning ? { rotateY: 360 } : { rotateY: 0 }}
-          transition={{
-            duration: 1,
-            repeat: isSpinning ? Infinity : 0,
-            ease: "linear",
-          }}
-        >
-          <GachaTicket isSpinning={isSpinning} result={gachaResult} />
-        </motion.div>
-      </div>
+      <Vibration isActive={currentEffect === "vibration"}>
+        <div className="relative w-full max-w-md mb-8">
+          <motion.div
+            animate={isSpinning ? { rotateY: 360 } : { rotateY: 0 }}
+            transition={{
+              duration: 1,
+              repeat: isSpinning ? Infinity : 0,
+              ease: "linear",
+            }}
+          >
+            <GachaTicket isSpinning={isSpinning} result={gachaResult} />
+          </motion.div>
+        </div>
+      </Vibration>
 
       <Button
         onClick={handleSpin}
