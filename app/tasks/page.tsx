@@ -9,7 +9,6 @@ const DUMMY_TASKS = [
     progress: 50,
     totalProgress: 100,
     dueDate: "2024-01-20",
-    status: "進行中",
   },
   {
     id: "2",
@@ -18,7 +17,6 @@ const DUMMY_TASKS = [
     progress: 3,
     totalProgress: 15,
     dueDate: "毎日実施",
-    status: "定期タスク",
   },
   {
     id: "3",
@@ -27,7 +25,6 @@ const DUMMY_TASKS = [
     progress: 80,
     totalProgress: 100,
     dueDate: "2024-01-21",
-    status: "完了間近",
   },
   {
     id: "4",
@@ -36,7 +33,6 @@ const DUMMY_TASKS = [
     progress: 12,
     totalProgress: 30,
     dueDate: "3日毎実施",
-    status: "定期タスク",
   },
 ];
 

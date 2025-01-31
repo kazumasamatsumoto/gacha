@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import confetti from "canvas-confetti";
 
 interface GachaResultModalProps {
@@ -17,74 +21,55 @@ export function GachaResultModal({
   onClose,
   result,
 }: GachaResultModalProps) {
-  const [showContent, setShowContent] = useState(false);
+  console.log("Modal Props:", { isOpen, result });
 
-  useEffect(() => {
-    if (isOpen) {
-      const timer = setTimeout(() => setShowContent(true), 1000);
-      return () => clearTimeout(timer);
-    } else {
-      setShowContent(false);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (result === "win" && showContent) {
+  React.useEffect(() => {
+    console.log("Modal Effect triggered:", { isOpen, result });
+    if (isOpen && result === "win") {
+      console.log("Confetti実行");
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
       });
     }
-  }, [result, showContent]);
+  }, [isOpen, result]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-purple-900 to-indigo-900 border-purple-500/20">
-        <AnimatePresence>
-          {showContent && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.5 }}
-              className="text-center p-6"
-            >
-              {result === "win" ? (
-                <>
-                  <h2 className="text-3xl font-bold text-yellow-400 mb-4">
-                    当たり！
-                  </h2>
-                  <p className="text-xl text-purple-200 mb-6">
-                    商品交換チケットを獲得しました！
+    <DialogPrimitive.Root open={isOpen} onOpenChange={onClose}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay
+          className="fixed inset-0 bg-black/50"
+          onClick={onClose}
+        />
+        <DialogPrimitive.Content
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          onClick={onClose}
+        >
+          <div
+            className="bg-gray-900 border border-yellow-500/20 rounded-lg p-6 w-[400px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DialogPrimitive.Title className="text-center text-yellow-500 text-xl font-bold mb-4">
+              {result === "win" ? "おめでとうございます！" : "残念..."}
+            </DialogPrimitive.Title>
+            <DialogPrimitive.Description asChild>
+              <div className="text-center">
+                <p className="text-yellow-500">
+                  {result === "win"
+                    ? "賞金100万信用ポイントが当たりました！"
+                    : "今回は外れてしまいました。次回の挑戦をお待ちしています！"}
+                </p>
+                {result === "lose" && (
+                  <p className="mt-2 text-yellow-500/60 text-sm">
+                    当選確率: 30%
                   </p>
-                  <div className="w-32 h-32 mx-auto mb-6 bg-yellow-400 rounded-full flex items-center justify-center">
-                    <span className="text-5xl">🎉</span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h2 className="text-3xl font-bold text-purple-400 mb-4">
-                    はずれ
-                  </h2>
-                  <p className="text-xl text-purple-200 mb-6">
-                    今回は商品交換チケットを獲得できませんでした。
-                  </p>
-                  <div className="w-32 h-32 mx-auto mb-6 bg-purple-700 rounded-full flex items-center justify-center">
-                    <span className="text-5xl">😢</span>
-                  </div>
-                </>
-              )}
-              <Button
-                onClick={onClose}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                閉じる
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </DialogContent>
-    </Dialog>
+                )}
+              </div>
+            </DialogPrimitive.Description>
+          </div>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 }
