@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import confetti from "canvas-confetti";
+import { useSettingsStore } from "@/store/settings-store";
 
 interface GachaResultModalProps {
   isOpen: boolean;
@@ -21,12 +22,10 @@ export function GachaResultModal({
   onClose,
   result,
 }: GachaResultModalProps) {
-  console.log("Modal Props:", { isOpen, result });
+  const { getWinRate } = useSettingsStore();
 
   React.useEffect(() => {
-    console.log("Modal Effect triggered:", { isOpen, result });
     if (isOpen && result === "win") {
-      console.log("Confetti実行");
       confetti({
         particleCount: 100,
         spread: 70,
@@ -62,7 +61,7 @@ export function GachaResultModal({
                 </p>
                 {result === "lose" && (
                   <p className="mt-2 text-yellow-500/60 text-sm">
-                    当選確率: 30%
+                    当選確率: {Math.round(getWinRate() * 100)}%
                   </p>
                 )}
               </div>

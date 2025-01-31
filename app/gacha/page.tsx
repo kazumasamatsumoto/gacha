@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { GachaResultModal } from "@/components/gacha-result-modal";
 import { useCurrencyStore } from "@/store/currency-store";
 import { toast } from "@/components/ui/toast";
-import Image from "next/image";
+import { useSettingsStore } from "@/store/settings-store";
 
 export default function GachaPage() {
   const { seigyoku, shinyouPoint, spendSeigyoku, addShinyouPoint } =
     useCurrencyStore();
+  const { getWinRate } = useSettingsStore();
   const [isSpinning, setIsSpinning] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [gachaResult, setGachaResult] = useState<"win" | "lose" | null>(null);
@@ -39,10 +40,10 @@ export default function GachaPage() {
 
     // 3秒後に結果を表示
     setTimeout(() => {
-      const result = Math.random() < 0.3 ? "win" : "lose";
+      const winRate = getWinRate();
+      const result = Math.random() < winRate ? "win" : "lose";
       setGachaResult(result);
 
-      // 当選時に100万信用ポイントを加算
       if (result === "win") {
         addShinyouPoint(1000000);
       }

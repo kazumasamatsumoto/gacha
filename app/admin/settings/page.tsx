@@ -1,82 +1,81 @@
+"use client";
+
+import { useState } from "react";
+import { useSettingsStore } from "@/store/settings-store";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
+import { Card } from "@/components/ui/card";
+import { toast } from "@/components/ui/toast";
 
 export default function SettingsPage() {
+  const { gachaSetting, setGachaSetting, getWinRate } = useSettingsStore();
+  const [currentSetting, setCurrentSetting] = useState<number>(gachaSetting);
+
+  const handleSettingChange = (setting: 1 | 2 | 3 | 4 | 5 | 6) => {
+    setCurrentSetting(setting);
+    setGachaSetting(setting);
+    toast.success("設定を更新しました", {
+      description: `ガチャ設定${setting}に変更（当選確率: ${Math.round(
+        getWinRate() * 100
+      )}%）`,
+    });
+  };
+
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">管理設定</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-white mb-8">管理設定</h1>
 
-      <div className="grid gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>ガチャ設定</CardTitle>
-            <CardDescription>ガチャの当選確率と天井機能の設定</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+      <Card className="p-6 bg-gray-900 border-yellow-500/20">
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-xl font-semibold text-yellow-500 mb-4">
+              ガチャ設定
+            </h2>
             <div className="space-y-4">
-              <div>
-                <Label>設定1の当選確率 (10%)</Label>
-                <Slider
-                  defaultValue={[10]}
-                  max={100}
-                  step={1}
-                  className="mt-2"
-                />
+              <div className="text-yellow-500 mb-4">
+                現在の設定: {currentSetting}（当選確率:{" "}
+                {Math.round(getWinRate() * 100)}%）
               </div>
-              <div>
-                <Label>設定6の当選確率 (100%)</Label>
-                <Slider
-                  defaultValue={[100]}
-                  max={100}
-                  step={1}
-                  className="mt-2"
-                />
+              <div className="grid grid-cols-3 gap-4">
+                {[1, 2, 3, 4, 5, 6].map((setting) => (
+                  <Button
+                    key={setting}
+                    onClick={() =>
+                      handleSettingChange(setting as 1 | 2 | 3 | 4 | 5 | 6)
+                    }
+                    className={`w-full ${
+                      currentSetting === setting
+                        ? "bg-yellow-500 hover:bg-yellow-600 text-black"
+                        : "bg-gray-800 hover:bg-gray-700 border border-yellow-500/20"
+                    }`}
+                  >
+                    <div>
+                      <div>設定{setting}</div>
+                      <div className="text-sm opacity-75">
+                        {setting === 1 && "10%"}
+                        {setting === 2 && "15%"}
+                        {setting === 3 && "20%"}
+                        {setting === 4 && "25%"}
+                        {setting === 5 && "30%"}
+                        {setting === 6 && "80%"}
+                      </div>
+                    </div>
+                  </Button>
+                ))}
               </div>
             </div>
+          </div>
+        </div>
+      </Card>
 
-            <div className="flex items-center space-x-2">
-              <Switch id="ceiling" />
-              <Label htmlFor="ceiling">天井機能を有効にする</Label>
-            </div>
-
-            <div>
-              <Label>天井到達回数</Label>
-              <Input type="number" placeholder="100" className="mt-2" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>タスク設定</CardTitle>
-            <CardDescription>
-              タスクの基本設定とポイント付与の設定
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>基本ポイント倍率</Label>
-              <Input type="number" placeholder="1.0" className="mt-2" />
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch id="auto-reset" />
-              <Label htmlFor="auto-reset">年間タスクの自動リセット</Label>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Button className="w-full">設定を保存</Button>
+      <div className="mt-4 text-sm text-gray-400">
+        <ul className="space-y-1">
+          <li>設定1: 当選確率 10%</li>
+          <li>設定2: 当選確率 15%</li>
+          <li>設定3: 当選確率 20%</li>
+          <li>設定4: 当選確率 25%</li>
+          <li>設定5: 当選確率 30%</li>
+          <li>設定6: 当選確率 80%</li>
+        </ul>
       </div>
     </div>
   );
