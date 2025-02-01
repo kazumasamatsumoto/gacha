@@ -92,12 +92,12 @@ export default function GachaPage() {
       <GogoLamp show={currentEffect === "gogo"} />
       <RainbowCutIn show={currentEffect === "rainbow"} />
 
-      <h1 className="text-4xl font-bold text-center mb-8 text-white">
+      <h1 className="text-4xl md:text-4xl font-bold text-center mb-8 text-white">
         宇宙ガチャ
       </h1>
 
       <Vibration isActive={currentEffect === "vibration"}>
-        <div className="relative w-full max-w-md mb-8">
+        <div className="relative w-full max-w-[300px] md:max-w-md mb-8">
           <motion.div
             animate={isSpinning ? { rotateY: 360 } : { rotateY: 0 }}
             transition={{
@@ -114,7 +114,7 @@ export default function GachaPage() {
       <Button
         onClick={handleSpin}
         disabled={isSpinning || seigyoku < 100}
-        className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+        className="w-full max-w-[300px] md:max-w-md bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
       >
         {isSpinning ? "スピン中..." : "ガチャを回す (100星玉)"}
       </Button>

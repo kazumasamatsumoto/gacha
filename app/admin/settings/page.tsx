@@ -22,20 +22,19 @@ export default function SettingsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-white mb-8">管理設定</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-white mb-8">管理設定</h1>
 
-      <Card className="p-6 bg-gray-900 border-yellow-500/20">
-        <div className="space-y-6">
+      <Card className="p-4 md:p-6 bg-gray-900 border-yellow-500/20">
+        <div className="space-y-4 md:space-y-6">
           <div>
-            <h2 className="text-xl font-semibold text-yellow-500 mb-4">
+            <h2 className="text-lg md:text-xl font-semibold text-yellow-500 mb-4">
               ガチャ設定
             </h2>
             <div className="space-y-4">
-              <div className="text-yellow-500 mb-4">
-                現在の設定: {currentSetting}（当選確率:{" "}
-                {Math.round(getWinRate() * 100)}%）
+              <div className="text-sm md:text-base text-yellow-500 mb-4">
+                現在の設定: {currentSetting}（当選確率: {Math.round(getWinRate() * 100)}%）
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
                 {[1, 2, 3, 4, 5, 6].map((setting) => (
                   <Button
                     key={setting}

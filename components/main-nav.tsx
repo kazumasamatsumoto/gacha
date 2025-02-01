@@ -1,69 +1,58 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-import { ListTodo, Gift, Store, Settings, Home } from "lucide-react";
-
-const navItems = [
-  {
-    href: "/",
-    label: "ホーム",
-    icon: Home,
-  },
-  {
-    href: "/tasks",
-    label: "タスク",
-    icon: ListTodo,
-  },
-  {
-    href: "/gacha",
-    label: "ガチャ",
-    icon: Gift,
-  },
-  {
-    href: "/exchange",
-    label: "交換所",
-    icon: Store,
-  },
-  {
-    href: "/admin/settings",
-    label: "設定",
-    icon: Settings,
-  },
-];
+import { Menu, X } from "lucide-react";
 
 export function MainNav() {
-  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const menuItems = [
+    { label: "タスク管理", href: "/tasks" },
+    { label: "ガチャ", href: "/gacha" },
+    { label: "アイテム交換所", href: "/exchange" },
+    { label: "管理設定", href: "/admin/settings" },
+  ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-sm border-b border-purple-500/20">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center space-x-4">
-          {navItems.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "relative px-4 py-2 text-sm font-medium transition-colors hover:text-purple-200",
-                pathname === href ? "text-purple-300" : "text-purple-400/60"
-              )}
-            >
-              <div className="flex items-center space-x-2">
-                <Icon size={16} />
-                <span>{label}</span>
-              </div>
-              {pathname === href && (
-                <motion.div
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500"
-                  layoutId="navbar-indicator"
-                />
-              )}
-            </Link>
-          ))}
+    <nav className="bg-gray-900 border-b border-yellow-500/20">
+      <div className="container mx-auto p-4 flex items-center justify-between">
+        <Link href="/" className="text-yellow-500 font-bold text-xl">
+          農業タスク管理
+        </Link>
+        <div>
+          <button
+            onClick={() => setIsOpen((prev) => !prev)}
+            className="text-gray-300 focus:outline-none"
+          >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
+      {isOpen && (
+        <div className="bg-gray-900 border-t border-yellow-500/20">
+          <ul className="flex flex-col space-y-4 p-4">
+            {menuItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className="block text-gray-300 hover:text-yellow-500"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </nav>
   );
 }
