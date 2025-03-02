@@ -26,6 +26,14 @@ export default function GachaPage() {
   // 演出用のstate（1つにまとめる）
   const [currentEffect, setCurrentEffect] = useState<EffectType>(null);
 
+  // クライアントサイドのみでレンダリングされるようにする
+  const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    // コンポーネントがマウントされたらクライアントサイドであることを示す
+    setIsClient(true);
+  }, []);
+
   const playRandomEffect = async () => {
     const effects: EffectType[] = ["blackout", "vibration", "gogo", "rainbow"];
     const randomEffect = effects[Math.floor(Math.random() * effects.length)];
@@ -34,6 +42,30 @@ export default function GachaPage() {
     // 演出の時間（2秒）を待つ
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setCurrentEffect(null);
+  };
+
+  const sendWinNotification = async () => {
+    try {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      
+      const message = `おめでとうございます！！${year}年${month}月${day}日${hours}時${minutes}分${seconds}秒に当選しました！！`;
+      
+      await fetch("https://helloworld-7abo7pjibq-uc.a.run.app", {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        body: message,
+      });
+    } catch (error) {
+      console.error("通知の送信に失敗しました", error);
+    }
   };
 
   const handleSpin = async () => {
@@ -66,6 +98,8 @@ export default function GachaPage() {
       await playRandomEffect();
       // 演出後もう少し回転
       await new Promise((resolve) => setTimeout(resolve, 1000));
+      // 当選時に通知を送信
+      await sendWinNotification();
     } else {
       // はずれの場合は通常の回転のみ
       await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -85,6 +119,17 @@ export default function GachaPage() {
     setShowResult(false);
     setGachaResult(null);
   };
+
+  // レンダリング部分
+  if (!isClient) {
+    // サーバーサイドレンダリング時は最小限の内容を表示
+    return <div className="container mx-auto px-4 py-8 min-h-screen flex flex-col items-center justify-center">
+      <h1 className="text-4xl md:text-4xl font-bold text-center mb-8 text-white">
+        宇宙ガチャ
+      </h1>
+      <p className="text-white">読み込み中...</p>
+    </div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen flex flex-col items-center justify-center">
